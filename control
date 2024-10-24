@@ -1,0 +1,9 @@
+Package: com.netskao.qqipadmodelogin
+Name: QQiPadModeLogin
+Depends: mobilesubstrate, firmware (>= 13.0)
+Version: 1.1-1
+Architecture: iphoneos-arm
+Description: QQ simulates iPad mode login
+Maintainer: Nets
+Author: Netskao
+Section: Netskao-Tweaks
