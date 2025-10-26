@@ -19,7 +19,7 @@ jobs:
     
     - name: Install Theos
       run: |
-        export THEOS=/opt/theos
+        export THEOS=$HOME/theos
         git clone --recursive https://github.com/theos/theos.git $THEOS
         echo "THEOS=$THEOS" >> $GITHUB_ENV
     
@@ -33,7 +33,7 @@ jobs:
     
     - name: Build tweak
       run: |
-        export THEOS=/opt/theos
+        export THEOS=$HOME/theos
         make clean || true
         make package
     
