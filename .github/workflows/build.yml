@@ -1,0 +1,63 @@
+name: Build and Package
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    
+    - name: Install Theos
+      run: |
+        export THEOS=/opt/theos
+        git clone --recursive https://github.com/theos/theos.git $THEOS
+        echo "THEOS=$THEOS" >> $GITHUB_ENV
+    
+    - name: Install iOS SDK
+      run: |
+        cd $THEOS/sdks
+        wget -q https://github.com/theos/sdks/archive/master.zip
+        unzip -q master.zip
+        mv sdks-master/* .
+        rm -rf sdks-master master.zip
+    
+    - name: Build tweak
+      run: |
+        export THEOS=/opt/theos
+        make clean || true
+        make package
+    
+    - name: List build artifacts
+      run: |
+        echo "=== DEB packages ==="
+        find . -name "*.deb" -type f || echo "No DEB files found"
+        echo "=== DYLIB files ==="
+        find .theos -name "*.dylib" -type f 2>/dev/null || echo "No DYLIB files found"
+        echo "=== Packages directory ==="
+        ls -la packages/ 2>/dev/null || echo "No packages directory"
+    
+    - name: Upload DEB package
+      uses: actions/upload-artifact@v3
+      with:
+        name: QQiPadModeLogin-deb
+        path: packages/*.deb
+        if-no-files-found: warn
+    
+    - name: Upload DYLIB library
+      uses: actions/upload-artifact@v3
+      with:
+        name: QQiPadModeLogin-dylib
+        path: .theos/obj/debug/**/*.dylib
+        if-no-files-found: warn
